@@ -9,7 +9,12 @@ Planned features (not in order of priority)
 - re-evaluate entire tree
 - set up more elaborate metadata database
 - possibility to process files in bulk instead of re-opening the index every time etc.
-
+- set up exceptions
+- compress inactive months
+- automatically name fotos based on image recognition
+- logic to prevent duplicates in the index.
+- generate unique identifier for each picture.
+- Check more thoroughly if something is an image before processing.
 
 Candidate fields for index:
 - Tags
