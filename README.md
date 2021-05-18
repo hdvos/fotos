@@ -15,7 +15,8 @@ Planned features (not in order of priority)
 - logic to prevent duplicates in the index.
 - generate unique identifier for each picture.
 - Check more thoroughly if something is an image before processing.
-- parametrize with cmnd line parameters.
+- ✓ parametrize with cmnd line parameters.
+- Write image object meta to json
 
 Candidate fields for index:
 - Tags

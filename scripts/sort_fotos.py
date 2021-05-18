@@ -1,7 +1,9 @@
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from PIL.ExifTags import TAGS, GPSTAGS
 
 import os, sys
+
+import argparse
 
 from dataclasses import dataclass, asdict
 
@@ -16,9 +18,18 @@ import shutil
 
 IMAGE_FOLDER = "/home/hugo/MEGA/fotos/pictures"
 
+CAMERA_UPLOADS = "/home/hugo/MEGA/Camera Uploads"
+DESTINATION = "/home/hugo/MEGA/fotos/pictures"
 
-image_filenames = os.listdir(IMAGE_FOLDER)
-image_filenames = [os.path.join(IMAGE_FOLDER, filename) for filename in image_filenames]
+parser = argparse.ArgumentParser(description='Sorts fotos by month.')
+parser.add_argument('-from', dest='original_location', type=str, default=CAMERA_UPLOADS, 
+                    help='Camera uploads folder')
+parser.add_argument('-destination_root', type=str, default=DESTINATION,
+                    help='Destination of the images')
+parser.add_argument('--keep', default=False, action="store_true",
+                    help='Destination of the images')
+
+
 
 #TODO: dingen met GPS
 
@@ -99,6 +110,9 @@ class MyImage():
         if not os.path.exists(image_root_destination):
             os.makedirs(image_root_destination)
         
+        # input(image_root_destination)
+        # sys.exit(2)
+
         try:
             year = str(self.DateTime.year)
         except AttributeError:
@@ -162,16 +176,44 @@ class MyImage():
 
 #%% Main
 if __name__ == '__main__':
-    # Change the working directory to the directory of the script. Mainly for the default location parameters to make sense.
-    os.chdir(os.path.split(__file__)[0])   
-    assert os.getcwd() == os.path.split(__file__)[0]
+    # # Change the working directory to the directory of the script. Mainly for the default location parameters to make sense.
+    # abspath = os.path.abspath(__file__)
+    # dname = os.path.dirname(abspath)
+    # # os.chdir(dname)
 
+
+    # # os.chdir(os.path.split(__file__)[0])      
+    # print('file before:', __file__)
+    # print('cwd before', os.getcwd()) 
+    # print('dirname before',  os.path.abspath(os.path.dirname(__file__)))
+    
+    # os.chdir(dname)      
+    # print("-"*40)
+
+    # print('file after:', __file__)
+    # print('cwd after', os.getcwd()) 
+    # print('dirname after',  os.path.abspath(os.path.dirname(__file__)))
+    # print("-"*40)
+    # assert os.getcwd() == os.path.abspath(os.path.dirname(__file__)), 'Check if cwd is correctly changed. '
+
+    # print('after cwd', os.getcwd()) 
+
+    args = parser.parse_args()
+
+    image_filenames = os.listdir(args.original_location)
+    image_filenames = [os.path.join(args.original_location, filename) for filename in image_filenames]
+    pprint(image_filenames)
+    # sys.exit(1)
 
     for i, image_name in enumerate(image_filenames):
         if os.path.isdir(image_name):
             continue    # If something is not an image name.
         
-        myimage = MyImage(image_name)
-        myimage.organize(remove_source=True)
-        myimage.add_to_index()
+        try:
+            myimage = MyImage(image_name)
+            myimage.organize(remove_source=not args.keep, image_root_destination=args.destination_root)
+            myimage.add_to_index()
+        except UnidentifiedImageError:
+            pass  #TODO do something?
         
+# %%
